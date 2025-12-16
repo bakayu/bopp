@@ -4,7 +4,7 @@ use crossterm::{
     execute,
     terminal::{self, EnterAlternateScreen, LeaveAlternateScreen},
 };
-use std::io::{self, Stdout, Write, stdout};
+use std::io::{self, Stdout, stdout};
 
 pub struct Terminal {
     stdout: Stdout,

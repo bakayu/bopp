@@ -38,3 +38,9 @@ impl Renderer {
         Ok(())
     }
 }
+
+impl Default for Renderer {
+    fn default() -> Self {
+        Self::new()
+    }
+}
