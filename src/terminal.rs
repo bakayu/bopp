@@ -10,6 +10,12 @@ pub struct Terminal {
     stdout: Stdout,
 }
 
+pub enum TerminalEvent {
+    Quit,
+    SwitchAnimation(usize),
+    None,
+}
+
 impl Terminal {
     pub fn new() -> io::Result<Self> {
         Ok(Self { stdout: stdout() })
@@ -36,17 +42,26 @@ impl Terminal {
         terminal::size()
     }
 
-    pub fn should_quit(&self) -> io::Result<bool> {
+    pub fn poll_event(&self) -> io::Result<TerminalEvent> {
         if event::poll(std::time::Duration::from_millis(0))? {
-            if let Event::Key(KeyEvent {
-                code: KeyCode::Char('q'),
-                ..
-            }) = event::read()?
-            {
-                return Ok(true);
+            match event::read()? {
+                Event::Key(KeyEvent {
+                    code: KeyCode::Char('q'),
+                    ..
+                }) => {
+                    return Ok(TerminalEvent::Quit);
+                }
+                Event::Key(KeyEvent {
+                    code: KeyCode::Char(c @ '1'..='9'),
+                    ..
+                }) => {
+                    let index = c.to_digit(10).unwrap() as usize - 1;
+                    return Ok(TerminalEvent::SwitchAnimation(index));
+                }
+                _ => {}
             }
         }
-        Ok(false)
+        Ok(TerminalEvent::None)
     }
 
     pub fn stdout(&mut self) -> &mut Stdout {

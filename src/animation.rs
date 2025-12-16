@@ -1,79 +1,52 @@
+use crate::animation_loader::AnimationConfig;
 use std::cell::Cell;
 
-pub struct RatAnimation {
+pub trait Animation {
+    fn get_current_frame(&self) -> &str;
+    fn next_frame(&self);
+    fn frame_count(&self) -> usize;
+    fn name(&self) -> &str;
+}
+
+pub struct CustomAnimation {
+    name: String,
     frames: Vec<String>,
     current_frame: Cell<usize>,
 }
 
-impl RatAnimation {
-    pub fn new() -> Self {
-        let frames = vec![
-            r#"
-    /\_/\
-   ( o.o )
-    > ^ <
-   /|   |\
-  (_|   |_)
-"#
-            .to_string(),
-            r#"
-    /\_/\
-   ( ^.^ )
-    > ~ <
-   /|   |\
-  (_|   |_)
-"#
-            .to_string(),
-            r#"
-    /\_/\
-   ( o.o )
-    > ^ <
-    |   |
-   / \ / \
-"#
-            .to_string(),
-            r#"
-    /\_/\
-   ( ^.^ )
-    > v <
-    |   |
-   / \ / \
-"#
-            .to_string(),
-            r#"
-    /\_/\
-   ( o.o )
-    > ^ <
-  /|     |\
- (_|     |_)
-"#
-            .to_string(),
-            r#"
-    /\_/\
-   ( ^.^ )
-    > w <
-  /|     |\
- (_|     |_)
-"#
-            .to_string(),
-        ];
-
+impl CustomAnimation {
+    pub fn new(config: AnimationConfig) -> Self {
         Self {
-            frames,
+            name: config.name,
+            frames: config.frames,
             current_frame: Cell::new(0),
         }
     }
 
-    pub fn get_current_frame(&self) -> &str {
+    pub fn from_frames(name: String, frames: Vec<String>) -> Self {
+        Self {
+            name,
+            frames,
+            current_frame: Cell::new(0),
+        }
+    }
+}
+
+impl Animation for CustomAnimation {
+    fn get_current_frame(&self) -> &str {
         &self.frames[self.current_frame.get()]
     }
 
-    pub fn next_frame(&self) {
+    fn next_frame(&self) {
         let next = (self.current_frame.get() + 1) % self.frames.len();
         self.current_frame.set(next);
     }
 
-    pub fn frame_count(&self) -> usize {
+    fn frame_count(&self) -> usize {
         self.frames.len()
+    }
+
+    fn name(&self) -> &str {
+        &self.name
     }
 }
