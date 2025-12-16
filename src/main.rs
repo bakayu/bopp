@@ -22,7 +22,6 @@ fn main() -> io::Result<()> {
         }
         Err(e) => {
             eprintln!("Warning: Could not load animations from directory: {}", e);
-            eprintln!("Creating example animations...");
         }
     }
 
